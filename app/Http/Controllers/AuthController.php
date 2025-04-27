@@ -24,8 +24,12 @@ class AuthController extends Controller
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
-            'token' => $token,
+            'status' => 'success',
+            'message' => 'Login successful',
+            'data' => [
+                'user' => $user,
+                'token' => $token
+            ]
         ], 200);
     }
 
@@ -40,8 +44,12 @@ class AuthController extends Controller
             $token = $user->createToken('api-token')->plainTextToken;
 
             return response()->json([
-                'user' => $user,
-                'token' => $token,
+                'status' => 'success',
+                'message' => 'Registration successful',
+                'data' => [
+                    'user' => $user,
+                    'token' => $token
+                ]
             ], 201);
         } catch (Exception $e) {
             return response()->json([
@@ -56,6 +64,7 @@ class AuthController extends Controller
             $request->user()->currentAccessToken()->delete();
 
             return response()->json([
+                'status' => 'success',
                 'message' => 'Logged out successfully'
             ], 200);
         } catch (Exception $e) {
