@@ -16,11 +16,17 @@ class StudentController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $students = Student::all();
+            $students = Student::paginate(10); // Paginate with 10 items per page
             return response()->json([
                 'status' => 'success',
                 'message' => 'Students retrieved successfully',
-                'data' => $students
+                'data' => $students->items(),
+                'meta' => [
+                    'current_page' => $students->currentPage(),
+                    'last_page' => $students->lastPage(),
+                    'per_page' => $students->perPage(),
+                    'total' => $students->total()
+                ]
             ], 200);
         } catch (Exception $e) {
             return response()->json([
