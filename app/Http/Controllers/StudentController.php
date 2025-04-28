@@ -16,7 +16,22 @@ class StudentController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $students = Student::paginate(10); // Paginate with 10 items per page
+            $page = request()->get('page', 1);
+            $perPage = request()->get('per_page', 10);
+            $search = request()->get('search', '');
+
+            $query = Student::query();
+            
+            if ($search) {
+                $query->where(function($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('email', 'LIKE', "%{$search}%");
+                });
+            }
+
+            $query->orderBy('created_at', 'desc');
+            $students = $query->paginate($perPage, ['*'], 'page', $page);
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Students retrieved successfully',
@@ -25,7 +40,9 @@ class StudentController extends Controller
                     'current_page' => $students->currentPage(),
                     'last_page' => $students->lastPage(),
                     'per_page' => $students->perPage(),
-                    'total' => $students->total()
+                    'total' => $students->total(),
+                    'next_page_url' => $students->nextPageUrl(),
+                    'prev_page_url' => $students->previousPageUrl()
                 ]
             ], 200);
         } catch (Exception $e) {
